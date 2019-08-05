@@ -1,5 +1,3 @@
-const readline = require('readline');
-
 let MYAPP = {};
 
 MYAPP.person = function () {
@@ -16,13 +14,15 @@ MYAPP.person = function () {
     }
 
     this.move = function () {
-        this.currentPlace = MYAPP.places[Math.random() * MYAPP.places.length];
+        let destination = MYAPP.places[0]; //Math.random() * MYAPP.places.length
+        this.currentPlace = destination;
+
+        destination.visitors.push(this);
     }
 
     this.name = 'Jack';
     this.homeLocation;
     this.update = function () {
-        
     }
 }
 
@@ -31,13 +31,19 @@ MYAPP.people = []; // all the spawned persons
 MYAPP.places = []; // all available places in the app
 
 MYAPP.place = function () {
-    name = 'Bar';
-    visitors = [];
+    this.name = 'Bar';
+    this.visitors = [];
 
-    get_visitors = function () {
-        for (i = 0; i < visitors.length; i++) {
-            console.log(this.visitors[i].name);
+    this.get_name = function () {
+        return this.name;
+    }
+    this.get_visitors = function () {
+        let visitorNames = [];
+        for (i = 0; i < this.visitors.length; i++) {
+            visitorNames.push(this.visitors[i].name);
         }
+
+        return visitorNames;
     }
 }
 
@@ -54,22 +60,26 @@ MYAPP.updatePeople = function () {
     }
 }
 
-MYAPP.inputHandle = function () {
-    response = readline;
-    if(response == 'people') {
-        console.log(MYAPP.people.length);
-    }
+MYAPP.draw = function () {
+    document.getElementById('places').innerHTML = MYAPP.places.length;
+    document.getElementById('people').innerHTML = MYAPP.people.length;
+    document.getElementById('places__names').innerHTML = MYAPP.places[0].get_name();
+    document.getElementById('place__visitors__number').innerHTML = MYAPP.places[0].visitors.length;
+    document.getElementById('place__visitors').innerHTML = MYAPP.places[0].get_visitors();
 }
 
 // start loop
 
 MYAPP.populate(3);
-new MYAPP.place();
+MYAPP.places.push(new MYAPP.place());
 
-setInterval(onTick, 1000);
+for(i = 0; i < MYAPP.people.length; i++) {
+    MYAPP.people[i].move();
+}
+
+setInterval(onTick, 500);
 
 function onTick() {
-    MYAPP.inputHandle();
-
     MYAPP.updatePeople();
+    MYAPP.draw();
 }
